@@ -68,7 +68,7 @@ jobs:
       GHA_MACHINE_TYPE: "n2-highmem-16"
 
     name: ${{ matrix.tool.name }}
-    runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
+    runs-on: 	ubuntu-latest
     container: ubuntu:jammy-20221130
     steps:
       - name: Cancel previous
@@ -191,7 +191,7 @@ jobs:
 
   Summary:
     name: Summary
-    runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
+    runs-on: 	ubuntu-latest
     container: ubuntu:jammy-20221130
     needs: Run
     env:
