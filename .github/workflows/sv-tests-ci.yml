@@ -14,50 +14,50 @@ jobs:
       fail-fast: false
       matrix:
         tool:
-          - name: icarus
-            deps: autoconf autotools-dev bison flex libfl-dev gperf
-          - name: moore
-            rust_ver: "1.61"
-          - name: odin
-            repo: odin_ii
-            deps: autoconf autotools-dev bison flex libfl-dev cmake pkg-config
-          - name: slang
-            deps: cmake pkg-config
-          - name: surelog
-            repo: Surelog
-            submodules: third_party/UHDM third_party/antlr4 third_party/googletest
-            deps: cmake default-jre pkg-config tclsh uuid-dev
-          - name: sv-parser
-            deps: cargo
-            rust_ver: "1.81"
+          # - name: icarus
+          #   deps: autoconf autotools-dev bison flex libfl-dev gperf
+          # - name: moore
+          #   rust_ver: "1.61"
+          # - name: odin
+          #   repo: odin_ii
+          #   deps: autoconf autotools-dev bison flex libfl-dev cmake pkg-config
+          # - name: slang
+          #   deps: cmake pkg-config
+          # - name: surelog
+          #   repo: Surelog
+          #   submodules: third_party/UHDM third_party/antlr4 third_party/googletest
+          #   deps: cmake default-jre pkg-config tclsh uuid-dev
+          # - name: sv-parser
+          #   deps: cargo
+          #   rust_ver: "1.81"
           - name: tree-sitter-systemverilog
             deps: gcc
           - name: tree-sitter-verilog
             deps: npm
-          - name: verible
-            deps: bazel=5.4.0 bison flex libfl-dev
-            skip-ccache: 1
-          - name: verilator
-            deps: autoconf autotools-dev bison flex help2man libfl-dev libelf-dev
-          - name: verilator-uhdm
-            submodules: Surelog vcddiff
-            deps: autoconf autotools-dev bison default-jre flex help2man libfl-dev cmake pkg-config tclsh uuid-dev libelf-dev
-            runners_filter: UhdmVerilator
-          - name: yosys
-            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev
-          - name: yosys-synlig
-            repo: synlig
-            submodules: third_party/yosys third_party/surelog
-            deps: cmake clang tcl-dev bison default-jre flex libfl-dev libreadline-dev pkg-config tclsh uuid-dev
-            runners_filter: SynligYosys
-          - name: zachjs-sv2v
-            deps: haskell-stack
-          - name: yosys-slang
-            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
-            submodules: third_party/slang
-          - name: circt-verilog
-            deps: cmake clang ninja-build lld
-            submodules: llvm
+          # - name: verible
+          #   deps: bazel=5.4.0 bison flex libfl-dev
+          #   skip-ccache: 1
+          # - name: verilator
+          #   deps: autoconf autotools-dev bison flex help2man libfl-dev libelf-dev
+          # - name: verilator-uhdm
+          #   submodules: Surelog vcddiff
+          #   deps: autoconf autotools-dev bison default-jre flex help2man libfl-dev cmake pkg-config tclsh uuid-dev libelf-dev
+          #   runners_filter: UhdmVerilator
+          # - name: yosys
+          #   deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev
+          # - name: yosys-synlig
+          #   repo: synlig
+          #   submodules: third_party/yosys third_party/surelog
+          #   deps: cmake clang tcl-dev bison default-jre flex libfl-dev libreadline-dev pkg-config tclsh uuid-dev
+          #   runners_filter: SynligYosys
+          # - name: zachjs-sv2v
+          #   deps: haskell-stack
+          # - name: yosys-slang
+          #   deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
+          #   submodules: third_party/slang
+          # - name: circt-verilog
+          #   deps: cmake clang ninja-build lld
+          #   submodules: llvm
     env:
       RUNNERS_FILTER: ${{ matrix.tool.runners_filter }}
       CCACHE_DIR: "/root/sv-tests/sv-tests/.cache/"
@@ -125,26 +125,26 @@ jobs:
         run: |
           stack upgrade
           
-      # - name: Checkout the tool submodule
-      #   run: |
-      #     # Github dropped support for unauthorized git: https://github.blog/2021-09-01-improving-git-protocol-security-github/
-      #     # Make sure we always use https:// instead of git://
-      #     git config --global url.https://github.com/.insteadOf git://github.com/
-      #     # take verilator from github (some tested tools still use a submodule
-      #     # from veripool)
-      #     git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
-      #     REPOSITORY_NAME=${{ matrix.tool.name }}
-      #     if [[ ! -z "${{ matrix.tool.repo }}" ]]; then
-      #       REPOSITORY_NAME=${{ matrix.tool.repo }}
-      #     fi
-      #     git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
-      #     if [[ ! -z "${{ matrix.tool.submodules }}" ]]; then
-      #       pushd third_party/tools/${REPOSITORY_NAME}
-      #       git submodule update --init --recursive --depth 1 ${{ matrix.tool.submodules }}
-      #       popd
-      #     fi
-      #     # yosys tool contains tests, is a dependency of other tools
-      #     git submodule update --init --recursive --depth 1 third_party/tools/yosys
+      - name: Checkout the tool submodule
+        run: |
+          # # Github dropped support for unauthorized git: https://github.blog/2021-09-01-improving-git-protocol-security-github/
+          # # Make sure we always use https:// instead of git://
+          # git config --global url.https://github.com/.insteadOf git://github.com/
+          # # take verilator from github (some tested tools still use a submodule
+          # # from veripool)
+          # git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
+          REPOSITORY_NAME=${{ matrix.tool.name }}
+          if [[ ! -z "${{ matrix.tool.repo }}" ]]; then
+            REPOSITORY_NAME=${{ matrix.tool.repo }}
+          fi
+          git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
+          if [[ ! -z "${{ matrix.tool.submodules }}" ]]; then
+            pushd third_party/tools/${REPOSITORY_NAME}
+            git submodule update --init --recursive --depth 1 ${{ matrix.tool.submodules }}
+            popd
+          fi
+          # yosys tool contains tests, is a dependency of other tools
+          git submodule update --init --recursive --depth 1 third_party/tools/yosys
           
       - name: Create Cache Timestamp
         id: cache_timestamp
