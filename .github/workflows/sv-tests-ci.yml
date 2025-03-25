@@ -137,7 +137,8 @@ jobs:
           if [[ ! -z "${{ matrix.tool.repo }}" ]]; then
             REPOSITORY_NAME=${{ matrix.tool.repo }}
           fi
-          git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
+          # git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
+          git submodule add --init --depth 1 third_party/tools/${REPOSITORY_NAME}
           if [[ ! -z "${{ matrix.tool.submodules }}" ]]; then
             pushd third_party/tools/${REPOSITORY_NAME}
             git submodule update --init --recursive --depth 1 ${{ matrix.tool.submodules }}
