@@ -180,10 +180,10 @@ jobs:
       - name: Check
         run:
           make info
-      - name: Checkout third party tests and cores
-        run: |
-          git submodule update --init --recursive --depth 1 third_party/tests
-          git submodule update --init --recursive --depth 1 third_party/cores
+      # - name: Checkout third party tests and cores
+      #   run: |
+      #     git submodule update --init --recursive --depth 1 third_party/tests
+      #     git submodule update --init --recursive --depth 1 third_party/cores
       - name: Run
         run: |
           BIG_GENERATORS_EXPR=$(echo $BIG_GENERATORS | sed 's/ /\\|/g')
@@ -221,8 +221,18 @@ jobs:
       TESTS_SUMMARY_DIR: "tests_summary/"
       DEBIAN_FRONTEND: "noninteractive"
     steps:
+      - name: Install Git
+        run: |
+          apt-get update -qq
+          apt-get install -y git
+      - name: verilator path
+        run:  git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          submodules: true
+      # - name: Checkout code
+      #   uses: actions/checkout@v2
       - name: Setup python
         run: |
           apt-get update -qq
@@ -244,14 +254,14 @@ jobs:
       - name: Extract
         run: |
           for file in $(find out/ -name *.tar -print); do tar -xf $file --strip-components=2 -C $(dirname $file); done
-      - name: Checkout third party tests and cores
-        run: |
-          # take verilator from github
-          git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
-          git submodule update --init --recursive --depth 1 third_party/tests
-          git submodule update --init --recursive --depth 1 third_party/cores
-          # yosys tool also contains tests
-          git submodule update --init --recursive --depth 1 third_party/tools/yosys
+      # - name: Checkout third party tests and cores
+      #   run: |
+      #     # take verilator from github
+      #     git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
+      #     git submodule update --init --recursive --depth 1 third_party/tests
+      #     git submodule update --init --recursive --depth 1 third_party/cores
+      #     # yosys tool also contains tests
+      #     git submodule update --init --recursive --depth 1 third_party/tools/yosys
       - name: Summary
         run: |
           ./.github/workflows/summary.sh
