@@ -9,6 +9,9 @@ set -e
 REPORTS_HISTORY=$(mktemp -d --suffix='.history')
 git clone https://github.com/chipsalliance/sv-tests-results.git --depth 120 "$REPORTS_HISTORY"
 
+# Create the directory if it doesn't exist
+mkdir -p "$(dirname "$COMPARE_REPORT")"
+
 # Delete headers from all report.csv
 for file in $(find ./out/report_* -name "*.csv" -print); do
 	sed -i.backup 1,1d $file
