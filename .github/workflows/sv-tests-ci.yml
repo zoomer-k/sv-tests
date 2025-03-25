@@ -80,6 +80,8 @@ jobs:
           echo "$SHELL"
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          submodules: recursive
       - name: Update apt repos
         run: |
           apt-get update -qq
@@ -124,8 +126,6 @@ jobs:
         if: ${{ contains(matrix.tool.deps, 'haskell') }}
         run: |
           stack upgrade
-      - name: add systemverilog
-        run: git submodule add https://github.com/gmlarumbe/tree-sitter-systemverilog 
           
       # - name: Checkout the tool submodule
       #   run: |
