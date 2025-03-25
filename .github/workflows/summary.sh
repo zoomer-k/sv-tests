@@ -7,6 +7,7 @@ set -e
 
 # Get base report from sv-tests master run
 REPORTS_HISTORY=$(mktemp -d --suffix='.history')
+BASE_REPORT="${}/report.csv"
 git clone https://github.com/chipsalliance/sv-tests-results.git --depth 120 "$REPORTS_HISTORY"
 
 # Create the directory if it doesn't exist
