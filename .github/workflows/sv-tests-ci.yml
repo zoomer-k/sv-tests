@@ -78,6 +78,10 @@ jobs:
       - name: Show shell
         run: |
           echo "$SHELL"
+      - name: Install Git
+        run: |
+          apt-get update -qq
+          apt-get install -y git
       - name: Checkout code
         uses: actions/checkout@v2
         with:
