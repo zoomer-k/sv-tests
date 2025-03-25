@@ -85,9 +85,9 @@ jobs:
       - name: verilator path
         run:  git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
       # - name: Install submodule
       #   run: |
       #         git submodule init
