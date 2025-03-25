@@ -82,10 +82,16 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y git
+      - name: verilator path
+        run:  git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
       - name: Checkout code
         uses: actions/checkout@v2
         with:
-          submodules: recursive
+          submodules: true
+      # - name: Install submodule
+      #   run: |
+      #         git submodule init
+      #         git submodule update
       - name: Update apt repos
         run: |
           apt-get update -qq
