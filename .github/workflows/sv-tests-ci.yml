@@ -89,7 +89,7 @@ jobs:
         with:
           submodules: recursive
       - name: add sv-report safe directory
-        run: git config --global --add safe.directory /__w/sv-tests/sv-tests./tools/sv-report --revision
+        run: git config --global --add safe.directory /__w/sv-tests/sv-tests
       # - name: Install submodule
       #   run: |
       #         git submodule init
