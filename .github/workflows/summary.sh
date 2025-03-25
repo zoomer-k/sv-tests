@@ -11,6 +11,10 @@ git clone https://github.com/chipsalliance/sv-tests-results.git --depth 120 "$RE
 
 # Create the directory if it doesn't exist
 mkdir -p "$(dirname "$COMPARE_REPORT")"
+mkdir -p "$(dirname "$PWD")"
+mkdir -p "$(dirname "$OUT_REPORT_DIR")"
+mkdir -p "$(dirname "$REPORTS_HISTORY")"
+
 
 # Delete headers from all report.csv
 for file in $(find ./out/report_* -name "*.csv" -print); do
