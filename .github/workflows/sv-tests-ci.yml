@@ -125,7 +125,7 @@ jobs:
         run: |
           stack upgrade
       - name: add systemverilog
-        run: git submodule add https://github.com/gmlarumbe/tree-sitter-systemverilog third_party/tools/${REPOSITORY_NAME}
+        run: git submodule add https://github.com/gmlarumbe/tree-sitter-systemverilog 
           
       # - name: Checkout the tool submodule
       #   run: |
