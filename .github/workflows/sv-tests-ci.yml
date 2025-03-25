@@ -124,6 +124,8 @@ jobs:
         if: ${{ contains(matrix.tool.deps, 'haskell') }}
         run: |
           stack upgrade
+      - name: add systemverilog
+        run: git submodule add https://github.com/gmlarumbe/tree-sitter-systemverilog third_party/tools/${REPOSITORY_NAME}
           
       # - name: Checkout the tool submodule
       #   run: |
@@ -138,7 +140,7 @@ jobs:
       #       REPOSITORY_NAME=${{ matrix.tool.repo }}
       #     fi
       #     # git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
-      #     git submodule update --init --depth 1 third_party/tools/${REPOSITORY_NAME}
+      #     # git submodule update --init --depth 1 
       #     if [[ ! -z "${{ matrix.tool.submodules }}" ]]; then
       #       pushd third_party/tools/${REPOSITORY_NAME}
       #       git submodule update --init --recursive --depth 1 ${{ matrix.tool.submodules }}
