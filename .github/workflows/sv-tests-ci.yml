@@ -223,10 +223,10 @@ jobs:
       TESTS_SUMMARY_DIR: "tests_summary/"
       DEBIAN_FRONTEND: "noninteractive"
     steps:
-      # - name: Install Git
-      #   run: |
-      #     apt-get update -qq
-      #     apt-get install -y git
+      - name: Install Git
+        run: |
+          apt-get update -qq
+          apt-get install -y git
       - name: verilator path
         run:  git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
       - name: Checkout code
