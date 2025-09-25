@@ -107,31 +107,31 @@ jobs:
       #     update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
       #     pip install --upgrade setuptools
       #     pip install -r conf/requirements.txt
-      - name: Install VeeR dependencies
-        run: |
-          apt install -y cpanminus
-          cpanm Bit::Vector JSON
-      - name: Install ccache
-        if: ${{ !matrix.tool.skip-ccache }}
-        run: |
-          apt install -y ccache
-      - name: Install tool-specific dependencies
-        if: ${{ matrix.tool.deps }}
-        run: |
-          apt -qq -y install ${{ matrix.tool.deps }}
-      - name: Setup Rust (if needed)
-        if: ${{ matrix.tool.rust_ver }}
-        run: |
-          apt -y install curl
-          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > setup.sh
-          sh setup.sh -y
-          source $HOME/.cargo/env
-          rustup install ${{ matrix.tool.rust_ver }}
-          rustup default ${{ matrix.tool.rust_ver }}
-      - name: Update haskell (if needed)
-        if: ${{ contains(matrix.tool.deps, 'haskell') }}
-        run: |
-          stack upgrade
+      # - name: Install VeeR dependencies
+      #   run: |
+      #     apt install -y cpanminus
+      #     cpanm Bit::Vector JSON
+      # - name: Install ccache
+      #   if: ${{ !matrix.tool.skip-ccache }}
+      #   run: |
+      #     apt install -y ccache
+      # - name: Install tool-specific dependencies
+      #   if: ${{ matrix.tool.deps }}
+      #   run: |
+      #     apt -qq -y install ${{ matrix.tool.deps }}
+      # - name: Setup Rust (if needed)
+      #   if: ${{ matrix.tool.rust_ver }}
+      #   run: |
+      #     apt -y install curl
+      #     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs > setup.sh
+      #     sh setup.sh -y
+      #     source $HOME/.cargo/env
+      #     rustup install ${{ matrix.tool.rust_ver }}
+      #     rustup default ${{ matrix.tool.rust_ver }}
+      # - name: Update haskell (if needed)
+      #   if: ${{ contains(matrix.tool.deps, 'haskell') }}
+      #   run: |
+      #     stack upgrade
       - name: Checkout the tool submodule
         run: |
           # Github dropped support for unauthorized git: https://github.blog/2021-09-01-improving-git-protocol-security-github/
