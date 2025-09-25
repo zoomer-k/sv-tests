@@ -80,9 +80,9 @@ jobs:
           echo "$SHELL"
       - name: Checkout code
         uses: actions/checkout@v2
-      # - name: Update apt repos
-      #   run: |
-      #     sudo apt-get update -qq
+      - name: Update apt repos
+        run: |
+          sudo apt-get update -qq
       # - name: Setup Node
       #   run: |
       #     apt -qq -y install curl
@@ -110,7 +110,8 @@ jobs:
       - name: Install VeeR dependencies
         run: |
           sudo apt install -y cpanminus
-          cpanm Bit::Vector JSON
+          sudo cpanm Bit::Vector JSON
+          
       # - name: Install ccache
       #   if: ${{ !matrix.tool.skip-ccache }}
       #   run: |
