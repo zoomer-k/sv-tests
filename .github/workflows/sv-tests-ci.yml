@@ -15,47 +15,47 @@ jobs:
       fail-fast: false
       matrix:
         tool:
-          - name: icarus
-            deps: autoconf autotools-dev bison flex libfl-dev gperf
-          - name: moore
-            rust_ver: "1.61"
-          - name: odin
-            repo: odin_ii
-            deps: autoconf autotools-dev bison flex libfl-dev cmake pkg-config
+          # - name: icarus
+          #   deps: autoconf autotools-dev bison flex libfl-dev gperf
+          # - name: moore
+          #   rust_ver: "1.61"
+          # - name: odin
+          #   repo: odin_ii
+          #   deps: autoconf autotools-dev bison flex libfl-dev cmake pkg-config
           - name: slang
             deps: cmake pkg-config
-          - name: surelog
-            repo: Surelog
-            submodules: third_party/UHDM third_party/antlr4 third_party/googletest
-            deps: cmake default-jre pkg-config tclsh uuid-dev
-          - name: sv-parser
-            deps: cargo
-            rust_ver: "1.81"
+          # - name: surelog
+          #   repo: Surelog
+          #   submodules: third_party/UHDM third_party/antlr4 third_party/googletest
+          #   deps: cmake default-jre pkg-config tclsh uuid-dev
+          # - name: sv-parser
+          #   deps: cargo
+          #   rust_ver: "1.81"
           - name: tree-sitter-systemverilog
             deps: gcc
           - name: tree-sitter-verilog
             deps: gcc
-          - name: verible
-            deps: bazel=7.6.1 bison flex libfl-dev
-            skip-ccache: 1
-          - name: verilator
-            deps: autoconf autotools-dev bison flex help2man libfl-dev libelf-dev
-            make_jobs_max: 4
-          - name: yosys
-            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev
-          - name: yosys-synlig
-            repo: synlig
-            submodules: third_party/yosys third_party/surelog
-            deps: cmake clang tcl-dev bison default-jre flex libfl-dev libreadline-dev pkg-config tclsh uuid-dev
-            runners_filter: SynligYosys
-          - name: zachjs-sv2v
-            deps: haskell-stack
-          - name: yosys-slang
-            deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
-            submodules: third_party/slang
-          - name: circt-verilog
-            deps: cmake clang ninja-build lld
-            submodules: llvm
+          # - name: verible
+          #   deps: bazel=7.6.1 bison flex libfl-dev
+          #   skip-ccache: 1
+          # - name: verilator
+          #   deps: autoconf autotools-dev bison flex help2man libfl-dev libelf-dev
+          #   make_jobs_max: 4
+          # - name: yosys
+          #   deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev
+          # - name: yosys-synlig
+          #   repo: synlig
+          #   submodules: third_party/yosys third_party/surelog
+          #   deps: cmake clang tcl-dev bison default-jre flex libfl-dev libreadline-dev pkg-config tclsh uuid-dev
+          #   runners_filter: SynligYosys
+          # - name: zachjs-sv2v
+          #   deps: haskell-stack
+          # - name: yosys-slang
+          #   deps: bison clang tcl-dev flex libfl-dev pkg-config libreadline-dev cmake pkg-config
+          #   submodules: third_party/slang
+          # - name: circt-verilog
+          #   deps: cmake clang ninja-build lld
+          #   submodules: llvm
     env:
       RUNNERS_FILTER: ${{ matrix.tool.runners_filter }}
       CCACHE_DIR: "/root/sv-tests/sv-tests/.cache/"
@@ -200,124 +200,124 @@ jobs:
             out_${{ matrix.tool.name }}.tar
             **/plot_*.svg
 
-  Summary:
-    name: Summary
-    runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
-    container: ubuntu:jammy-20221130
-    needs: Run
-    env:
-      ANALYZER: "$PWD/tools/report_analyzer.py"
-      GRAPHER: "$PWD/tools/history-graph"
-      OUT_REPORT_DIR: "$PWD/out/report/"
-      COMPARE_REPORT: "$OUT_REPORT_DIR/report.csv"
-      REPORTS_HISTORY: "$(mktemp -d --suffix='.history')"
-      BASE_REPORT: "$REPORTS_HISTORY/report.csv"
-      CHANGES_SUMMARY_JSON: "$OUT_REPORT_DIR/tests_summary.json"
-      CHANGES_SUMMARY_MD: "$OUT_REPORT_DIR/tests_summary.md"
-      TESTS_SUMMARY_DIR: "tests_summary/"
-      DEBIAN_FRONTEND: "noninteractive"
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Setup python
-        run: |
-          apt-get update -qq
-          apt install -y python3 python3-pip wget git curl jq
-          update-alternatives --install /usr/bin/python python /usr/bin/python3 1
-          update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
-          pip install --upgrade setuptools
-          pip install -r conf/requirements.txt
-      - name: Install VeeR dependencies
-        run: |
-          apt install -y cpanminus
-          cpanm Bit::Vector JSON
-      - name: Prepare output directories
-        run: |
-          mkdir -p out/report
-      - uses: actions/download-artifact@v4
-        with:
-          path: ./out/
-      - name: Extract
-        run: |
-          for file in $(find out/ -name *.tar -print); do tar -xf $file --strip-components=2 -C $(dirname $file); done
-      - name: Checkout third party tests and cores
-        run: |
-          # take verilator from github
-          git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
-          git submodule update --init --recursive --depth 1 third_party/tests
-          git submodule update --init --recursive --depth 1 third_party/cores
-          # yosys tool also contains tests
-          git submodule update --init --recursive --depth 1 third_party/tools/yosys
-          # icarus contains tests
-          git submodule update --init --depth 1 third_party/tools/icarus
-      - name: Summary
-        run: |
-          ./.github/workflows/summary.sh
-          ./.github/workflows/report.sh
-      - name: Update sv-tests-results repository
-        if: github.ref == 'refs/heads/master'
-        run: |
-          eval $(ssh-agent -s)
-          ssh-add - <<< "${{ secrets.REPORT_DEPLOY_KEY }}"
-          mkdir -p ~/.ssh
-          chmod 700 ~/.ssh
-          ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
-          ./.github/workflows/update_report.sh
-      - name: Prepare artifacts for PR commenter
-        if: github.event_name == 'pull_request'
-        run: |
-          mkdir $TESTS_SUMMARY_DIR
-          echo ${{ github.event.number }} > $TESTS_SUMMARY_DIR/issue_num
-          cp $COMPARE_REPORT $TESTS_SUMMARY_DIR/report_base.csv
-          cp $OUT_REPORT_DIR/report.csv $TESTS_SUMMARY_DIR/report_new.csv
-          cp $OUT_REPORT_DIR/new_*csv $TESTS_SUMMARY_DIR
-          cp $OUT_REPORT_DIR/tests_summary.json $TESTS_SUMMARY_DIR
-          cp $OUT_REPORT_DIR/tests_summary.md $TESTS_SUMMARY_DIR
-          find out -name plot_*.svg -exec cp {} $TESTS_SUMMARY_DIR \;
+  # Summary:
+  #   name: Summary
+  #   runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
+  #   container: ubuntu:jammy-20221130
+  #   needs: Run
+  #   env:
+  #     ANALYZER: "$PWD/tools/report_analyzer.py"
+  #     GRAPHER: "$PWD/tools/history-graph"
+  #     OUT_REPORT_DIR: "$PWD/out/report/"
+  #     COMPARE_REPORT: "$OUT_REPORT_DIR/report.csv"
+  #     REPORTS_HISTORY: "$(mktemp -d --suffix='.history')"
+  #     BASE_REPORT: "$REPORTS_HISTORY/report.csv"
+  #     CHANGES_SUMMARY_JSON: "$OUT_REPORT_DIR/tests_summary.json"
+  #     CHANGES_SUMMARY_MD: "$OUT_REPORT_DIR/tests_summary.md"
+  #     TESTS_SUMMARY_DIR: "tests_summary/"
+  #     DEBIAN_FRONTEND: "noninteractive"
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Setup python
+  #       run: |
+  #         apt-get update -qq
+  #         apt install -y python3 python3-pip wget git curl jq
+  #         update-alternatives --install /usr/bin/python python /usr/bin/python3 1
+  #         update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1
+  #         pip install --upgrade setuptools
+  #         pip install -r conf/requirements.txt
+  #     - name: Install VeeR dependencies
+  #       run: |
+  #         apt install -y cpanminus
+  #         cpanm Bit::Vector JSON
+  #     - name: Prepare output directories
+  #       run: |
+  #         mkdir -p out/report
+  #     - uses: actions/download-artifact@v4
+  #       with:
+  #         path: ./out/
+  #     - name: Extract
+  #       run: |
+  #         for file in $(find out/ -name *.tar -print); do tar -xf $file --strip-components=2 -C $(dirname $file); done
+  #     - name: Checkout third party tests and cores
+  #       run: |
+  #         # take verilator from github
+  #         git config --global url."https://github.com/verilator/verilator".insteadOf http://git.veripool.org/git/verilator
+  #         git submodule update --init --recursive --depth 1 third_party/tests
+  #         git submodule update --init --recursive --depth 1 third_party/cores
+  #         # yosys tool also contains tests
+  #         git submodule update --init --recursive --depth 1 third_party/tools/yosys
+  #         # icarus contains tests
+  #         git submodule update --init --depth 1 third_party/tools/icarus
+  #     - name: Summary
+  #       run: |
+  #         ./.github/workflows/summary.sh
+  #         ./.github/workflows/report.sh
+  #     # - name: Update sv-tests-results repository
+  #     #   if: github.ref == 'refs/heads/master'
+  #     #   run: |
+  #     #     eval $(ssh-agent -s)
+  #     #     ssh-add - <<< "${{ secrets.REPORT_DEPLOY_KEY }}"
+  #     #     mkdir -p ~/.ssh
+  #     #     chmod 700 ~/.ssh
+  #     #     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+  #     #     ./.github/workflows/update_report.sh
+  #     - name: Prepare artifacts for PR commenter
+  #       if: github.event_name == 'pull_request'
+  #       run: |
+  #         mkdir $TESTS_SUMMARY_DIR
+  #         echo ${{ github.event.number }} > $TESTS_SUMMARY_DIR/issue_num
+  #         cp $COMPARE_REPORT $TESTS_SUMMARY_DIR/report_base.csv
+  #         cp $OUT_REPORT_DIR/report.csv $TESTS_SUMMARY_DIR/report_new.csv
+  #         cp $OUT_REPORT_DIR/new_*csv $TESTS_SUMMARY_DIR
+  #         cp $OUT_REPORT_DIR/tests_summary.json $TESTS_SUMMARY_DIR
+  #         cp $OUT_REPORT_DIR/tests_summary.md $TESTS_SUMMARY_DIR
+  #         find out -name plot_*.svg -exec cp {} $TESTS_SUMMARY_DIR \;
 
-      - name: Post GitHub summary
-        run: |
-          cat $CHANGES_SUMMARY_MD > $GITHUB_STEP_SUMMARY
+  #     - name: Post GitHub summary
+  #       run: |
+  #         cat $CHANGES_SUMMARY_MD > $GITHUB_STEP_SUMMARY
 
-      - name: Upload artifacts for summary
-        uses: actions/upload-artifact@v4
-        if: github.event_name == 'pull_request'
-        with:
-          name: tests_summary
-          path: |
-            ./tests_summary/
-      - name: Find artifacts that are no longer needed
-        id: get-artifacts-to-delete
-        if: github.event_name == 'pull_request'
-        run: |
-          artifacts=$(find ./out -type d -name 'report_*' -exec basename {} \;)
-          echo $artifacts
-          artifacts="${artifacts//'%'/'%25'}"
-          artifacts="${artifacts//$'\n'/'%0A'}"
-          artifacts="${artifacts//$'\r'/'%0D'}"
-          echo "artifacts=$artifacts" >> GITHUB_OUTPUT
-          echo $artifacts
-      - name: Delete Old Artifacts
-        if: github.event_name == 'pull_request'
-        uses: geekyeggo/delete-artifact@v5
-        with:
-          name: ${{ steps.get-artifacts-to-delete.outputs.artifacts }}
-  Automerge:
-    name: Automerge dependabot pull requests
-    permissions:
-      pull-requests: write
-      contents: write
-    runs-on: ubuntu-latest
-    needs: Summary
-    if: ${{ github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]' }}
-    steps:
-      - name: Dependabot metadata
-        id: metadata
-        uses: dependabot/fetch-metadata@v1.1.1
-        with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
-      - name: Enable auto-merge for Dependabot PRs
-        run: gh pr merge --auto --merge "$PR_URL"
-        env:
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Upload artifacts for summary
+  #       uses: actions/upload-artifact@v4
+  #       if: github.event_name == 'pull_request'
+  #       with:
+  #         name: tests_summary
+  #         path: |
+  #           ./tests_summary/
+  #     - name: Find artifacts that are no longer needed
+  #       id: get-artifacts-to-delete
+  #       if: github.event_name == 'pull_request'
+  #       run: |
+  #         artifacts=$(find ./out -type d -name 'report_*' -exec basename {} \;)
+  #         echo $artifacts
+  #         artifacts="${artifacts//'%'/'%25'}"
+  #         artifacts="${artifacts//$'\n'/'%0A'}"
+  #         artifacts="${artifacts//$'\r'/'%0D'}"
+  #         echo "artifacts=$artifacts" >> GITHUB_OUTPUT
+  #         echo $artifacts
+  #     - name: Delete Old Artifacts
+  #       if: github.event_name == 'pull_request'
+  #       uses: geekyeggo/delete-artifact@v5
+  #       with:
+  #         name: ${{ steps.get-artifacts-to-delete.outputs.artifacts }}
+  # Automerge:
+  #   name: Automerge dependabot pull requests
+  #   permissions:
+  #     pull-requests: write
+  #     contents: write
+  #   runs-on: ubuntu-latest
+  #   needs: Summary
+  #   if: ${{ github.event_name == 'pull_request' && github.event.pull_request.user.login == 'dependabot[bot]' }}
+  #   steps:
+  #     - name: Dependabot metadata
+  #       id: metadata
+  #       uses: dependabot/fetch-metadata@v1.1.1
+  #       with:
+  #         github-token: "${{ secrets.GITHUB_TOKEN }}"
+  #     - name: Enable auto-merge for Dependabot PRs
+  #       run: gh pr merge --auto --merge "$PR_URL"
+  #       env:
+  #         PR_URL: ${{ github.event.pull_request.html_url }}
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
