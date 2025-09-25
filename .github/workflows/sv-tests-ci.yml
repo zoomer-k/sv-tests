@@ -180,15 +180,25 @@ jobs:
         run: |
           git submodule update --init --recursive --depth 1 third_party/tests
           git submodule update --init --recursive --depth 1 third_party/cores
+      # - name: Run
+      #   run: |
+      #     BIG_GENERATORS_EXPR=$(echo $BIG_GENERATORS | sed 's/ /\\|/g')
+      #     export STABLE_GENERATORS=$(make list-generators | tr ' ' '\n' | grep -v "${BIG_GENERATORS_EXPR}")
+      #     export UNSTABLE_GENERATORS=$(make list-generators | tr ' ' '\n' | grep "${BIG_GENERATORS_EXPR}")
+      #     export JOBS=${{ matrix.tool.make_jobs_max }}
+      #     if [[ "${JOBS}x" == "x" ]]; then export JOBS=$(nproc); fi
+      #     for gen in ${STABLE_GENERATORS}; do echo "==GEN stable $gen -j $JOBS" ; make generate-$gen -j${JOBS}; make -j ${JOBS}; done
+      #     for gen in ${UNSTABLE_GENERATORS}; do echo "==GEN unstable $gen" ; make generate-$gen; make; done
+      
       - name: Run
         run: |
-          BIG_GENERATORS_EXPR=$(echo $BIG_GENERATORS | sed 's/ /\\|/g')
-          export STABLE_GENERATORS=$(make list-generators | tr ' ' '\n' | grep -v "${BIG_GENERATORS_EXPR}")
-          export UNSTABLE_GENERATORS=$(make list-generators | tr ' ' '\n' | grep "${BIG_GENERATORS_EXPR}")
-          export JOBS=${{ matrix.tool.make_jobs_max }}
-          if [[ "${JOBS}x" == "x" ]]; then export JOBS=$(nproc); fi
-          for gen in ${STABLE_GENERATORS}; do echo "==GEN stable $gen -j $JOBS" ; make generate-$gen -j${JOBS}; make -j ${JOBS}; done
-          for gen in ${UNSTABLE_GENERATORS}; do echo "==GEN unstable $gen" ; make generate-$gen; make; done
+          ALL_GENERATORS=$(make list-generators | tr ' ' '\n')
+          for gen in ${ALL_GENERATORS}; do
+            echo "==GEN $gen"
+            make generate-$gen
+            make
+          done
+
       - name: Prepare Report
         run:
           mv out/report/report.csv out/report/${{ matrix.tool.name }}_report.csv
