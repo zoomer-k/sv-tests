@@ -67,8 +67,9 @@ jobs:
 
     name: ${{ matrix.tool.name }}
     #runs-on: [self-hosted, Linux, X64, gcp-custom-runners]
-    runs-on: [Linux]
-    container: ubuntu:jammy-20221130
+    # runs-on: [Linux]
+    # container: ubuntu:jammy-20221130
+    runs-on: ubuntu-latest
     steps:
       - name: Cancel previous
         uses: styfle/cancel-workflow-action@0.8.0
